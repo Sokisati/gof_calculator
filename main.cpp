@@ -210,22 +210,7 @@ d = 1;
 
     }
 
-    //write
-    for (int i = 1; x >= i; i++) {
 
-        for (int k = 1; y >= k; k++) {
-            if (gridArray[k][i][g] == 1) {
-                SetConsoleTextAttribute(h, 10);
-                cout << "  " << gridArray[k][i][g];
-            } else {
-                SetConsoleTextAttribute(h, 4);
-                cout << "  " << gridArray[k][i][g];
-            }
-
-
-        }
-        cout << "\n";
-    }
     //we are now operating for the current composition
 
     while(true){
@@ -318,28 +303,6 @@ d = 1;
         }
 
 
-//lets write down the next generation
-        for(int i=1; x>=i; i++)
-        {
-
-            for(int k=1; y>=k; k++)
-            {
-                if(gridArray[k][i][g]==1)
-                {
-                    SetConsoleTextAttribute(h,10);
-                    cout<<"  "<<gridArray[k][i][g];
-                }
-                else
-                {
-                    SetConsoleTextAttribute(h,4);
-                    cout<<"  "<<gridArray[k][i][g];
-                }
-
-
-            }
-            cout<<"\n";
-        }
-
         aliveCellsArray[g]=aliveCells;
 
         if(g>2 && aliveCellsArray[g]==aliveCellsArray[g-1])
@@ -372,8 +335,8 @@ d = 1;
 
 }
 
-cout<<"w"<<wantYouGone<<endl;
-cout<<"s"<<stillAlive<<endl;
+cout<<wantYouGone+1<<" compositions eventually die"<<endl;
+cout<<stillAlive<<" live forever, driving to Valhalla"<<endl;
 
 
 
