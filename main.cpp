@@ -113,6 +113,9 @@ int main()
 a generation, peakAliveCell for knowing the max amount of alive cells and peakGeneration for knowing which generation peaked in terms of alive cell count
 */
     int x,y,g,delay,aliveCells,stableCounter,peakAliveCell,peakGeneration,totalCombinations;
+    int stillAlive = 0;
+    int wantYouGone = 0;
+    int probabilityArray[15];
 
 
     //for using color, nothing really special again
@@ -122,7 +125,7 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
     SetConsoleTextAttribute(h,11);
 
     //LOOK OUT
-    x = 3;
+    x = 4;
     y = x;
 
     totalCombinations = pow(2,pow(x,2));
@@ -134,7 +137,7 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
     int gridArray[x+2][y+2][420];
 
     //LOOK OUT
-    delay=1;
+    delay=0;
 
 
 
@@ -192,6 +195,7 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
 
 for(int m=c; m<totalCombinations; m++) {
 
+    cout<<"operating for composition: "<<m<<endl<<endl;
 d = 1;
 
     for (int i = 1; x >= i; i++) {
@@ -224,17 +228,6 @@ d = 1;
     }
     //we are now operating for the current composition
 
-
-
-    cout<<"\n"<<endl<<endl;
-
-}
-
-
-
-
-
-/*
     while(true){
 //scan every array value and decide if they are alive or not in the next generation
 
@@ -247,7 +240,6 @@ d = 1;
 
             for(int k=1; k<=y; k++)
             {
-
 
                 //lets count the alive neighbour cell for every cell
 
@@ -262,8 +254,6 @@ d = 1;
                         (k!=0 && i!=0 && gridArray[k-1][i-1][g]==1) +
                         (k+1<=x && i!=0 && gridArray[k+1][i-1][g]==1) +
                         (k+1<=x && i+1<=y && gridArray[k+1][i+1][g]==1);
-
-
 
                 //lets judge if he is alive or not
 
@@ -286,6 +276,14 @@ d = 1;
 //now we are gonna operate for next generation
         g++;
 
+        if(g>400)
+        {
+            cout<<"Looks like it reached into a stable or ever-repeating position. No need to calculate for another billion generations, right?"<<endl;
+            stillAlive++;
+            cout<<"still alive: "<<stillAlive<<endl;
+            break;
+        }
+
 
         SetConsoleTextAttribute(h,11);
         cout<<"\n"<<"\n";
@@ -307,19 +305,15 @@ d = 1;
             }
 
         }
-        if(aliveCells>peakAliveCell)
-        {
-            peakAliveCell=aliveCells;
-            peakGeneration = g;
-        }
+
 
         cout<<"alive cells :"<<aliveCells<<endl;
         if(aliveCells==0)
         {
-            int endOfLine2;
+
             cout<<"All cells are dead. This place once thrived with life, now it's a wasteland because of your composition."<<endl;
-            cout<<"peak number of alive cells was: "<<peakAliveCell<<" in generation: "<<peakGeneration<<endl;
-            cin>>endOfLine2;
+            wantYouGone++;
+            cout<<"want you gone:"<<wantYouGone<<endl;
             break;
         }
 
@@ -346,9 +340,6 @@ d = 1;
             cout<<"\n";
         }
 
-
-
-
         aliveCellsArray[g]=aliveCells;
 
         if(g>2 && aliveCellsArray[g]==aliveCellsArray[g-1])
@@ -364,15 +355,30 @@ d = 1;
 
         if(stableCounter==20)
         {
-            int endOfLine1;
             cout<<"Looks like it reached into a stable or ever-repeating position. No need to calculate for another billion generations, right?"<<endl;
-            cout<<"peak number of alive cells was: "<<peakAliveCell<<" in generation: "<<peakGeneration<<endl;
+            stillAlive++;
+            cout<<"still alive: "<<stillAlive<<endl;
             break;
         }
 
         aliveCells=0;
 
     }
+    //end of while loop
+  g = 0;
+
+
+    cout<<"\n"<<endl<<endl;
+
+}
+
+cout<<"w"<<wantYouGone<<endl;
+cout<<"s"<<stillAlive<<endl;
+
+
+
+/*
+
 */
 
 return 0;
