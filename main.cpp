@@ -1,7 +1,6 @@
 #include <iostream>
 
 //for using sleep() function
-#include <stdio.h>
 #include <unistd.h>
 
 //for using color
@@ -75,27 +74,6 @@ int binaryCompositionGenerator(int totalDigit, int desiredDigitNumber,int desire
             return digitArray[desiredDigitNumber];
         }
 
-/*
-        //write to console
-
-        for (int i = 1; i <= totalDigit; i++)
-        {
-            if(digitArray[i]==1)
-            {
-                SetConsoleTextAttribute(h,10);
-                cout << digitArray[i];
-            }
-            else
-            {
-                SetConsoleTextAttribute(h,15);
-                cout << digitArray[i];
-            }
-
-        }
-        SetConsoleTextAttribute(h,4);
-        cout<<"  composition number is: "<<c;
-        cout << "\n";
-*/
         c++;
 
     }
@@ -113,9 +91,9 @@ int main()
 a generation, peakAliveCell for knowing the max amount of alive cells and peakGeneration for knowing which generation peaked in terms of alive cell count
 */
     int x,y,g,delay,aliveCells,stableCounter,peakAliveCell,peakGeneration,totalCombinations;
-    int stillAlive = 0;
-    int wantYouGone = 0;
-    int probabilityArray[15];
+    double stillAlive = 0;
+    double wantYouGone = 0;
+    float probabilityArray[15];
 
 
     //for using color, nothing really special again
@@ -125,19 +103,21 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
     SetConsoleTextAttribute(h,11);
 
     //LOOK OUT
-    x = 4;
+    x = 3;
     y = x;
 
-    totalCombinations = pow(2,pow(x,2));
+    totalCombinations = pow(2,x*x);
+    int stage1 = totalCombinations/4;
+    int stage2 = totalCombinations/4*2;
+    int stage3 = totalCombinations/4*3;
 
-    g = 0;
+                g = 0;
     stableCounter = 0;
     aliveCells = 0;
-    int aliveCellsArray[420];
-    int gridArray[x+2][y+2][420];
 
-    //LOOK OUT
-    delay=0;
+    int aliveCellsArray[420];
+
+    int gridArray[x+2][y+2][420];
 
 
 
@@ -157,33 +137,6 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
     }
 
 
-
-
-
-
-//write the first generation
-    for(int i=1; x>=i; i++)
-    {
-
-        for(int k=1; y>=k; k++)
-        {
-            if(gridArray[k][i][g]==1)
-            {
-                SetConsoleTextAttribute(h,10);
-                cout<<"  "<<gridArray[k][i][g];
-            }
-            else
-            {
-                SetConsoleTextAttribute(h,4);
-                cout<<"  "<<gridArray[k][i][g];
-            }
-
-
-        }
-        cout<<"\n";
-    }
-    cout<<"\n"<<endl;
-
  //this is where the fun begins
  //a quick test
 
@@ -192,16 +145,29 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
  int c = 1;
 
 
-
 for(int m=c; m<totalCombinations; m++) {
 
-    cout<<"operating for composition: "<<m<<endl<<endl;
+
+    if(m==stage1)
+    {
+        cout<<"1/4"<<" completed"<<endl<<endl;
+    }
+    if(m==stage2)
+    {
+        cout<<"2/4"<<" completed"<<endl<<endl;
+    }
+    if(m==stage3)
+    {
+        cout<<"3/4"<<" completed"<<endl<<endl;
+    }
+
+
+
 d = 1;
 
     for (int i = 1; x >= i; i++) {
 
         for (int k = 1; y >= k; k++) {
-
 
             gridArray[k][i][g] = binaryCompositionGenerator(t, d, m);
             d++;
@@ -209,7 +175,6 @@ d = 1;
         }
 
     }
-
 
     //we are now operating for the current composition
 
@@ -261,18 +226,15 @@ d = 1;
 //now we are gonna operate for next generation
         g++;
 
-        if(g>400)
+        if(g>300)
         {
-            cout<<"Looks like it reached into a stable or ever-repeating position. No need to calculate for another billion generations, right?"<<endl;
             stillAlive++;
-            cout<<"still alive: "<<stillAlive<<endl;
             break;
         }
 
 
         SetConsoleTextAttribute(h,11);
-        cout<<"\n"<<"\n";
-        cout<<"generation: "<<g<<endl;
+
 
 //count the alive cells
         for(int i=1; x>=i; i++)
@@ -286,19 +248,15 @@ d = 1;
                     aliveCells++;
                 }
 
-
             }
 
         }
 
 
-        cout<<"alive cells :"<<aliveCells<<endl;
+
         if(aliveCells==0)
         {
-
-            cout<<"All cells are dead. This place once thrived with life, now it's a wasteland because of your composition."<<endl;
             wantYouGone++;
-            cout<<"want you gone:"<<wantYouGone<<endl;
             break;
         }
 
@@ -316,11 +274,10 @@ d = 1;
 
         SetConsoleTextAttribute(h,11);
 
-        if(stableCounter==20)
+        if(stableCounter==10)
         {
-            cout<<"Looks like it reached into a stable or ever-repeating position. No need to calculate for another billion generations, right?"<<endl;
+
             stillAlive++;
-            cout<<"still alive: "<<stillAlive<<endl;
             break;
         }
 
@@ -331,18 +288,14 @@ d = 1;
   g = 0;
 
 
-    cout<<"\n"<<endl<<endl;
-
 }
 
 cout<<wantYouGone+1<<" compositions eventually die"<<endl;
 cout<<stillAlive<<" live forever, driving to Valhalla"<<endl;
+probabilityArray[1]=stillAlive/totalCombinations;
+cout<<"probability: "<<probabilityArray[1];
 
 
-
-/*
-
-*/
 
 return 0;
 }
