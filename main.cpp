@@ -6,9 +6,7 @@
 //for using color
 #include <windows.h>
 
-//for using randomnes
-#include <cstdlib>
-#include <ctime>
+
 #include <cmath>
 
 using namespace std;
@@ -84,7 +82,6 @@ int binaryCompositionGenerator(int totalDigit, int desiredDigitNumber,int desire
 int main()
 {
 
-    srand(time(0));
 
 
 /*x for x spectrum, y for y spectrum, delay for sleeping the program for a specific amount of seconds, aliveCells for counting alive cells in
@@ -103,7 +100,7 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
     SetConsoleTextAttribute(h,11);
 
     //LOOK OUT
-    x = 3;
+    x = 2;
     y = x;
 
     totalCombinations = pow(2,x*x);
@@ -119,8 +116,7 @@ a generation, peakAliveCell for knowing the max amount of alive cells and peakGe
 
     int gridArray[x+2][y+2][420];
 
-
-
+  
 
 //mark all as dead
 
@@ -228,6 +224,7 @@ d = 1;
 
         if(g>300)
         {
+            //aliveCompositionArray[m]=1;
             stillAlive++;
             break;
         }
@@ -256,6 +253,7 @@ d = 1;
 
         if(aliveCells==0)
         {
+           // aliveCompositionArray[m]=0;
             wantYouGone++;
             break;
         }
@@ -276,7 +274,7 @@ d = 1;
 
         if(stableCounter==10)
         {
-
+            //aliveCompositionArray[m]=1;
             stillAlive++;
             break;
         }
@@ -293,7 +291,8 @@ d = 1;
 cout<<wantYouGone+1<<" compositions eventually die"<<endl;
 cout<<stillAlive<<" live forever, driving to Valhalla"<<endl;
 probabilityArray[1]=stillAlive/totalCombinations;
-cout<<"probability: "<<probabilityArray[1];
+cout<<"probability: "<<probabilityArray[1]<<endl<<endl;
+
 
 
 
