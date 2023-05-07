@@ -217,7 +217,7 @@ d = 1;
         }
 
 //we sometimes need to examine generations so there should be some breathing time (also it looks ugly as hell otherwise)
-        sleep(delay);
+        //sleep(delay); https://stackoverflow.com/questions/3727420/significance-of-sleep0
 
 //now we are gonna operate for next generation
         g++;
