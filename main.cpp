@@ -1,79 +1,142 @@
+
+
+
+//only chunk of code I copied from internet was the SetConsoleTextAttribute function (which isn't crucial anyway, entirely for aesthetics purpose)
+
 #include <iostream>
 
-//for using sleep() function
-#include <unistd.h>
+//for using vector
+#include<vector>
 
 //for using color
 #include <windows.h>
 
-
+//for pow function
 #include <cmath>
 
 using namespace std;
 
-int binaryCompositionGenerator(int totalDigit, int desiredDigitNumber,int desiredCompositionNumber)
+//WATCH OUT FOR checkAgain VALUE
+vector<int> patternFinderFunction(vector<int> testedVector)
 {
 
-    HANDLE h=GetStdHandle(STD_OUTPUT_HANDLE);
-    int c;
-    c = 0;
-    int totalCombinations;
-    totalCombinations = pow(2,totalDigit);
+    int i,c,p,checkAgain,t;
+    bool searchBool = false;
 
-    int digitArray[totalDigit+1];
+    i = 1;
+    p = 0;
+    checkAgain = 1;
 
+    vector<int> foundPattern;
 
-    //fill intial composition with zero
-    for(int i=totalDigit; i>0; i--)
+    for(i; i<testedVector.size(); i++)
     {
-        digitArray[i]=0;
-    }
-
-    c++;
+        searchBool = false;
+        checkAgain = 1;
 
 
-    //action begins
-    while(c<=totalCombinations)
-    {
-        int steps;
-        steps = 0;
-        //for loop for general checking
-        for(int i=totalDigit; i>0; i--)
+
+        for(c=i-1; c>1; c--)
         {
-            //count the steps needed to reach a zero
-            if(digitArray[i]!=0)
+            if(searchBool)
             {
-                steps++;
-            }
-
-                //now use it
-            else
-            {
-                int t = totalDigit;
-
-                for(int s=steps ; s>0; s--)
-                {
-                    digitArray[t]=0;
-                    t--;
-                }
-
-                //it erased all the past 1's into all zeros. now make the final digit, a one
-                digitArray[t]=1;
                 break;
             }
 
+            while(testedVector[c]==testedVector[i])
+            {
 
+                searchBool = true;
+                p++;
+                if(i-c-p==0)
+                {
+                    if(checkAgain<4)
+                    {
+                        checkAgain++;
+                        t = c;
+                        c = i;
+                        i = 2*i - t;
+                        p = 0;
+                    }
+                    else{
+                        p = 0;
+                        for (p; i - c - p > 0; p++)
+                        {
+                            foundPattern.push_back(testedVector[i + p]);
+                        }
+                        return foundPattern;
+                    }
+                }
+
+                //pattern with period of above 8 are not possible within a 30x30 grid, hence the i-c>8
+                if(testedVector[c+p]!=testedVector[i+p] || i-c>8)
+                {
+                    p = 0;
+                    break;
+                }
+            }
         }
+    }
 
-        //now we need to operate for next composition
-        //check if we reached the desired place
-        if(c==desiredCompositionNumber)
+    return foundPattern;
+}
+int binaryCompositionGenerator(int totalDigit, int desiredDigitNumber,int desiredCompositionNumber) {
+
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    int c = 0;
+    int steps = 0;
+    int totalCombinations = pow(2, totalDigit);
+
+    if(desiredDigitNumber>totalDigit || desiredCompositionNumber>totalCombinations)
+    {
+        return 404;
+    }
+    if (desiredCompositionNumber==0)
+    {
+        return 0;
+    }
+
+    int digitArray[totalDigit + 1];
+
+
+    //fill intial composition with zero
+    for (int i = 0; i < totalDigit; i++)
+    {
+        digitArray[i] = 0;
+    }
+
+
+    while(c<=totalCombinations)
+    {
+
+        if(digitArray[steps]==0)
         {
-            return digitArray[desiredDigitNumber];
+            for(int i=0; steps-i>0; i++)
+            {
+                digitArray[i]=0;
+            }
+            digitArray[steps]=1;
+
+            //we just created a new composition
+            c++;
+
+            if(desiredCompositionNumber==c)
+            {
+                return digitArray[desiredDigitNumber];
+            }
+            else
+            {
+                steps = 0;
+            }
+
         }
 
-        c++;
-
+            //count the steps needed to reach a zero
+        else
+        {
+            steps++;
+        }
     }
 
 }
@@ -83,218 +146,135 @@ int main()
 {
 
 
-
-/*x for x spectrum, y for y spectrum, delay for sleeping the program for a specific amount of seconds, aliveCells for counting alive cells in
-a generation, peakAliveCell for knowing the max amount of alive cells and peakGeneration for knowing which generation peaked in terms of alive cell count
+/*x for x spectrum, y for y spectrum,aliveCells for counting alive cells in each generation
 */
-    int x,y,g,delay,aliveCells,stableCounter,peakAliveCell,peakGeneration,totalCombinations;
-    double stillAlive = 0;
-    double wantYouGone = 0;
-    float probabilityArray[15];
+    int x,y,g,swap,aliveCells,peakAliveCell,peakGeneration,neiCounter;
 
 
     //for using color, nothing really special again
     HANDLE h=GetStdHandle(STD_OUTPUT_HANDLE);
-
     //11 means bright cyan, it looks cool
     SetConsoleTextAttribute(h,11);
 
     //LOOK OUT
-    x = 2;
+    x = 3;
+
     y = x;
-
-    totalCombinations = pow(2,x*x);
-    int stage1 = totalCombinations/4;
-    int stage2 = totalCombinations/4*2;
-    int stage3 = totalCombinations/4*3;
-
-                g = 0;
-    stableCounter = 0;
+    int totalDigit = pow(x+1,2);
+    int totalCombinations = pow(2,totalDigit) - 1;
+    swap = 0;
+    g = 0;
+    neiCounter = 0;
     aliveCells = 0;
+    peakAliveCell = 0;
+    peakGeneration = 0;
+    vector<int> aliveCellsVector;
+    vector<int> pattern;
+    int gridArray[x+1][y+1][2];
+    int deadComposition = 0;
+    int aliveComposition = 0;
+    bool deadCompositionBool = false;
 
-    int aliveCellsArray[420];
+    int compositionNumber = 0;
+    int desiredDigitNumber = 0;
 
-    int gridArray[x+2][y+2][420];
 
-  
-
-//mark all as dead
-
-    for(int i=1; x>=i; i++)
+    while(compositionNumber<=totalCombinations)
     {
-
-        for(int k=1; y>=k; k++)
+        //first we must create the initial composition,starting from zero
+        for(int i=0; x>=i; i++)
         {
-
-            gridArray[k][i][g]=0;
-
-        }
-
-    }
-
-
- //this is where the fun begins
- //a quick test
-
- int t = x*x;
- int d = 1;
- int c = 1;
-
-
-for(int m=c; m<totalCombinations; m++) {
-
-
-    if(m==stage1)
-    {
-        cout<<"1/4"<<" completed"<<endl<<endl;
-    }
-    if(m==stage2)
-    {
-        cout<<"2/4"<<" completed"<<endl<<endl;
-    }
-    if(m==stage3)
-    {
-        cout<<"3/4"<<" completed"<<endl<<endl;
-    }
-
-
-
-d = 1;
-
-    for (int i = 1; x >= i; i++) {
-
-        for (int k = 1; y >= k; k++) {
-
-            gridArray[k][i][g] = binaryCompositionGenerator(t, d, m);
-            d++;
-
-        }
-
-    }
-
-    //we are now operating for the current composition
-
-    while(true){
-//scan every array value and decide if they are alive or not in the next generation
-
-//we need to know how many alive neighbours a cell has so we can determine whether it's alive in the next gen or not (note: in all 8 directions)
-        int neiCounter =0;
-
-
-        for(int i=1; i<=x; i++)
-        {
-
-            for(int k=1; k<=y; k++)
+            for(int k=0; y>=k; k++)
             {
+               gridArray[k][i][swap] = binaryCompositionGenerator(totalDigit,desiredDigitNumber,compositionNumber);
+               desiredDigitNumber++;
+            }
+        }
 
-                //lets count the alive neighbour cell for every cell
+        g = 0;
 
-                //every if statement has at least one safety precaution (like k!0=0 or i+1<=y) so that program doesn't look for an array value that doesn't exist.
-                //one more important thing is that we need to put the safety precaution first inside the statement
-                neiCounter=
-                        (k!=0 && gridArray[k-1][i][g]==1) +
-                        (k+1<=x && gridArray[k+1][i][g]==1) +
-                        (i+1<=y && gridArray[k][i+1][g]==1) +
-                        (i!=0 && gridArray[k][i-1][g]==1) +
-                        (i+1<=y && k!=0 && gridArray[k-1][i+1][g]==1) +
-                        (k!=0 && i!=0 && gridArray[k-1][i-1][g]==1) +
-                        (k+1<=x && i!=0 && gridArray[k+1][i-1][g]==1) +
-                        (k+1<=x && i+1<=y && gridArray[k+1][i+1][g]==1);
+        while(true)
+        {
 
-                //lets judge if he is alive or not
+            aliveCells = 0;
 
+            for(int i=0; i<=x; i++)
+            {
+                for(int k=0; k<=y; k++)
+                {
+                    neiCounter=
+                            (k!=0 && gridArray[k-1][i][swap]==1) +
+                            (k+1<=x && gridArray[k+1][i][swap]==1) +
+                            (i+1<=y && gridArray[k][i+1][swap]==1) +
+                            (i!=0 && gridArray[k][i-1][swap]==1) +
+                            (i+1<=y && k!=0 && gridArray[k-1][i+1][swap]==1) +
+                            (k!=0 && i!=0 && gridArray[k-1][i-1][swap]==1) +
+                            (k+1<=x && i!=0 && gridArray[k+1][i-1][swap]==1) +
+                            (k+1<=x && i+1<=y && gridArray[k+1][i+1][swap]==1);
 
-                if((neiCounter == 2 && gridArray[k][i][g]==1) || (neiCounter == 3 && gridArray[k][i][g] == 1) || (neiCounter == 3 && gridArray[k][i][g] == 0)){
-                    gridArray[k][i][g+1] = 1;
-                } else{
-                    gridArray[k][i][g+1] = 0;
+                    if((neiCounter == 2 && gridArray[k][i][swap]==1) || (neiCounter == 3 && gridArray[k][i][swap] == 1) || (neiCounter == 3 && gridArray[k][i][swap] == 0)){
+
+                        gridArray[k][i][!swap] = 1;
+                    } else{
+                        gridArray[k][i][!swap] = 0;
+                    }
+                    neiCounter = 0;
                 }
 
-                //we need to reset the counter so that it doesn't add up constantly
-                neiCounter = 0;
             }
 
-        }
-
-//we sometimes need to examine generations so there should be some breathing time (also it looks ugly as hell otherwise)
-        //sleep(delay); https://stackoverflow.com/questions/3727420/significance-of-sleep0
-
 //now we are gonna operate for next generation
-        g++;
-
-        if(g>300)
-        {
-            //aliveCompositionArray[m]=1;
-            stillAlive++;
-            break;
-        }
-
-
-        SetConsoleTextAttribute(h,11);
+            swap = !swap;
+            g++;
 
 
 //count the alive cells
-        for(int i=1; x>=i; i++)
-        {
-
-            for(int k=1; y>=k; k++)
+            for(int i=0; x>=i; i++)
             {
-
-                if(gridArray[k][i][g]==1)
+                for(int k=0; y>=k; k++)
                 {
-                    aliveCells++;
+                    if(gridArray[k][i][swap]==1)
+                    {
+                        aliveCells++;
+                    }
                 }
+            }
 
+            aliveCellsVector.push_back(aliveCells);
+
+            if(aliveCells==0)
+            {
+                SetConsoleTextAttribute(h,6);
+                //it's a dead number/composition
+                cout<<"composition: "<<compositionNumber<<" is dead"<<endl;
+                deadComposition++;
+                aliveCellsVector.clear();
+                break;
+            }
+
+
+            pattern = patternFinderFunction(aliveCellsVector);
+            if(!pattern.empty())
+            {
+                SetConsoleTextAttribute(h,8);
+                cout<<"composition: "<<compositionNumber<<" is alive forever"<<endl;
+                //it's an alive number/composition
+                aliveComposition++;
+                aliveCellsVector.clear();
+                break;
             }
 
         }
 
 
-
-        if(aliveCells==0)
-        {
-           // aliveCompositionArray[m]=0;
-            wantYouGone++;
-            break;
-        }
-
-
-        aliveCellsArray[g]=aliveCells;
-
-        if(g>2 && aliveCellsArray[g]==aliveCellsArray[g-1])
-        {
-            stableCounter++;
-        }
-        else
-        {
-            stableCounter=0;
-        }
-
-        SetConsoleTextAttribute(h,11);
-
-        if(stableCounter==10)
-        {
-            //aliveCompositionArray[m]=1;
-            stillAlive++;
-            break;
-        }
-
-        aliveCells=0;
-
+        desiredDigitNumber = 0;
+        compositionNumber++;
+        SetConsoleTextAttribute(h,9);
     }
-    //end of while loop
-  g = 0;
+
+    cout<<"dead: "<<deadComposition<<endl;
+    cout<<"alive: "<<aliveComposition<<endl;
 
 
-}
-
-cout<<wantYouGone+1<<" compositions eventually die"<<endl;
-cout<<stillAlive<<" live forever, driving to Valhalla"<<endl;
-probabilityArray[1]=stillAlive/totalCombinations;
-cout<<"probability: "<<probabilityArray[1]<<endl<<endl;
-
-
-
-
-return 0;
+    return 0;
 }
