@@ -1,8 +1,3 @@
-
-
-
-//only chunk of code I copied from internet was the SetConsoleTextAttribute function (which isn't crucial anyway, entirely for aesthetics purpose)
-
 #include <iostream>
 
 //for using vector
@@ -16,69 +11,70 @@
 
 using namespace std;
 
-//WATCH OUT FOR checkAgain VALUE
-vector<int> patternFinderFunction(vector<int> testedVector)
+vector<int> patternFinderFunction(vector<int> aliveCellsVector)
 {
 
-    int i,c,p,checkAgain,t;
+    int i,c,p,checkAgain,t,tempI;
     bool searchBool = false;
+    vector<int> patternFound;
 
     i = 1;
     p = 0;
-    checkAgain = 1;
+    tempI = i;
 
-    vector<int> foundPattern;
-
-    for(i; i<testedVector.size(); i++)
+    for(i; i<aliveCellsVector.size(); i++)
     {
         searchBool = false;
         checkAgain = 1;
+        tempI = i;
 
-
-
-        for(c=i-1; c>1; c--)
+        for(c=i-1; c>=1; c--)
         {
             if(searchBool)
             {
+                i = tempI;
                 break;
             }
 
-            while(testedVector[c]==testedVector[i])
+            while(aliveCellsVector[c]==aliveCellsVector[i])
             {
-
-                searchBool = true;
                 p++;
-                if(i-c-p==0)
+                searchBool = true;
+
+                if(i-c-p<=0)
                 {
-                    if(checkAgain<4)
+                    if(checkAgain<2)
                     {
                         checkAgain++;
                         t = c;
                         c = i;
+                        tempI = i;
                         i = 2*i - t;
                         p = 0;
                     }
-                    else{
+                    else
+                    {
                         p = 0;
                         for (p; i - c - p > 0; p++)
                         {
-                            foundPattern.push_back(testedVector[i + p]);
+                            patternFound.push_back(aliveCellsVector[i + p]);
                         }
-                        return foundPattern;
+                        return patternFound;
                     }
                 }
 
                 //pattern with period of above 8 are not possible within a 30x30 grid, hence the i-c>8
-                if(testedVector[c+p]!=testedVector[i+p] || i-c>8)
+                if(aliveCellsVector[c+p]!=aliveCellsVector[i+p] || i-c>8)
                 {
                     p = 0;
+                    i = tempI;
                     break;
                 }
             }
         }
     }
 
-    return foundPattern;
+    return patternFound;
 }
 int binaryCompositionGenerator(int totalDigit, int desiredDigitNumber,int desiredCompositionNumber) {
 
@@ -157,7 +153,7 @@ int main()
     SetConsoleTextAttribute(h,11);
 
     //LOOK OUT
-    x = 3;
+    x = 2;
 
     y = x;
     int totalDigit = pow(x+1,2);
